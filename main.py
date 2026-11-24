@@ -27,15 +27,24 @@ SENTENCE = (
 DST = "/output/entry.txt"
 
 
-def main():
-    text = SENTENCE.strip()
+def validate(text: str) -> None:
+    """Check the gate rules: 1-200 chars, exactly one sentence, one line."""
     if not (1 <= len(text) <= 200):
         raise ValueError("entry must be 1-200 characters, got %d" % len(text))
     if text.count(".") != 1 or not text.endswith("."):
         raise ValueError("entry must be exactly one sentence")
+    if "\n" in text or "\r" in text:
+        raise ValueError("entry must be a single line")
+
+
+def main():
+    text = SENTENCE.strip()
+    validate(text)
     os.makedirs(os.path.dirname(DST), exist_ok=True)
-    with open(DST, "w", encoding="utf-8") as f:
+    tmp = DST + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         f.write(text)
+    os.replace(tmp, DST)
     print("wrote %s (%d characters)" % (DST, len(text)))
 
 
